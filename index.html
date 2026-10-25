@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Astronaut in the Ocean</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Сброс отступов */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            /* Убираем синее выделение при тапе на телефонах */
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Запрещаем выделять текст */
+            -webkit-user-select: none;
+        }
+        
         body {
             font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
             height: 100vh;
@@ -16,7 +26,6 @@
             background: #0b0f1a;
             overflow: hidden;
             color: #fff;
-            transition: all 0.3s ease;
         }
 
         /* Анимированный градиентный фон */
@@ -34,7 +43,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Звёзды на фоне */
+        /* Звёзды */
         .stars {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -57,7 +66,7 @@
         .fullscreen-btn {
             position: fixed;
             top: 20px;
-            left: 20px; /* Сдвинули влево */
+            left: 20px;
             width: 45px;
             height: 45px;
             background: rgba(255, 255, 255, 0.1);
@@ -70,12 +79,15 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease; /* Плавная анимация */
             backdrop-filter: blur(10px);
+            outline: none; /* Убираем рамку фокуса */
         }
-        .fullscreen-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.1);
+        
+        /* Эффект при нажатии (посветление и уменьшение) */
+        .fullscreen-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.85);
         }
 
         /* Основная карточка */
@@ -94,7 +106,6 @@
             transition: all 0.4s ease;
         }
 
-        /* Увеличение карточки в полноэкранном режиме */
         :fullscreen .card {
             max-width: 600px;
             padding: 50px 40px;
@@ -117,6 +128,7 @@
             border: 2px solid rgba(255, 255, 255, 0.15);
             display: block;
             transition: transform 0.4s ease;
+            pointer-events: none; /* Чтобы клики не выделяли картинку */
         }
         :fullscreen .cover {
             width: 300px;
@@ -143,19 +155,6 @@
             margin-bottom: 25px;
             letter-spacing: 0.5px;
         }
-
-        /* Подсказка */
-        .hint {
-            font-size: 0.8rem;
-            color: #93c5fd;
-            margin-top: 15px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        :fullscreen .hint { display: none; }
 
         /* Аудиоплеер */
         audio {
@@ -189,13 +188,11 @@
         <h1>Astronaut in the Ocean</h1>
         <p class="artist">Masked Wolf</p>
 
-        <!-- Твой файл song.mp3 -->
+        <!-- Плеер (song.mp3) -->
         <audio id="myAudio" controls loop>
             <source src="song.mp3" type="audio/mpeg">
             Ваш браузер не поддерживает аудиоплеер.
         </audio>
-
-        <p class="hint">Нажми на экран для полного погружения</p>
     </div>
 
     <script>
@@ -221,54 +218,44 @@
         // Функция для переключения полноэкранного режима
         function toggleFullScreen() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                // Включаем
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen().catch(e => console.log(e));
                 } else if (document.documentElement.webkitRequestFullscreen) { 
                     document.documentElement.webkitRequestFullscreen();
                 }
-                fsBtn.innerHTML = '✕'; // Меняем на крестик
+                fsBtn.innerHTML = '✕'; 
             } else {
-                // Выключаем
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen) { 
                     document.webkitExitFullscreen();
                 }
-                fsBtn.innerHTML = '⛶'; // Возвращаем значок
+                fsBtn.innerHTML = '⛶'; 
             }
         }
 
-        // 1. Работа кнопки в левом верхнем углу
+        // 1. Работа кнопки
         fsBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Чтобы клик по кнопке не срабатывал дважды
+            e.stopPropagation(); 
             toggleFullScreen();
         });
 
         // 2. Включение при клике в любом месте страницы
         document.addEventListener('click', (e) => {
-            // Если кликнули по кнопке или по плееру — не вмешиваемся
-            if (e.target === fsBtn || e.target.tagName === 'AUDIO' || e.target.closest('audio')) {
+            // Если кликнули по плееру — не трогаем
+            if (e.target.tagName === 'AUDIO' || e.target.closest('audio')) {
                 return; 
             }
             
-            // Включаем полный экран (если еще не включен)
+            // Включаем полный экран, если еще не включен
             if (!document.fullscreenElement) {
                 toggleFullScreen();
             }
 
-            // И пробуем запустить музыку, если она на паузе
+            // Пробуем запустить музыку
             if (audio.paused) {
-                audio.play().catch(err => console.log("Браузер заблокировал звук", err));
+                audio.play().catch(err => console.log("Звук заблокирован", err));
             }
-        });
-
-        // Синхронизация иконки, если пользователь вышел из полного экрана через Esc
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) fsBtn.innerHTML = '⛶';
-        });
-        document.addEventListener('webkitfullscreenchange', () => {
-            if (!document.webkitFullscreenElement) fsBtn.innerHTML = '⛶';
         });
     </script>
 

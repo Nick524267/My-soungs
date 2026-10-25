@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Astronaut in the Ocean — Masked Wolf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Astronaut in the Ocean</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -14,8 +14,9 @@
             justify-content: center;
             align-items: center;
             background: #0b0f1a;
-            overflow: hidden; /* Запрет прокрутки */
+            overflow: hidden;
             color: #fff;
+            transition: all 0.3s ease;
         }
 
         /* Анимированный градиентный фон */
@@ -65,7 +66,17 @@
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: all 0.4s ease;
+            cursor: pointer; /* Курсор в виде руки, чтобы намекнуть на клик */
         }
+
+        /* Увеличение карточки в полноэкранном режиме */
+        :fullscreen .card {
+            max-width: 600px;
+            padding: 50px 40px;
+            border-radius: 40px;
+        }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -82,8 +93,12 @@
             border: 2px solid rgba(255, 255, 255, 0.15);
             display: block;
             transition: transform 0.4s ease;
+            pointer-events: none; /* Чтобы клики проходили на карточку */
         }
-        .cover:hover { transform: scale(1.04) rotate(-1deg); }
+        :fullscreen .cover {
+            width: 300px;
+            height: 300px;
+        }
 
         /* Текст */
         h1 {
@@ -95,14 +110,33 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            pointer-events: none;
         }
+        :fullscreen h1 { font-size: 2rem; }
+
         .artist {
             font-size: 1.05rem;
             color: #a0aec0;
             font-weight: 400;
             margin-bottom: 25px;
             letter-spacing: 0.5px;
+            pointer-events: none;
         }
+
+        /* Подсказка "Нажмите" */
+        .hint {
+            font-size: 0.8rem;
+            color: #93c5fd;
+            margin-top: 15px;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        /* Скрываем подсказку в полноэкранном режиме */
+        :fullscreen .hint { display: none; }
 
         /* Аудиоплеер */
         audio {
@@ -118,6 +152,7 @@
         @media (max-width: 480px) {
             .card { padding: 28px 20px; }
             .cover { width: 180px; height: 180px; }
+            :fullscreen .cover { width: 220px; height: 220px; }
             h1 { font-size: 1.4rem; }
         }
     </style>
@@ -127,24 +162,23 @@
     <div class="bg-gradient"></div>
     <div class="stars" id="stars"></div>
 
-    <div class="card">
-        <img 
-            src="https://i.discogs.com/5R-oq3TIGcORe074z72WtHIKTukRglruK_86wlSyhag/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE3NjAx/ODI2LTE2NDI3ODky/NTMtOTE5Ni5qcGVn.jpeg" 
-            alt="Astronaut in the Ocean Cover" 
-            class="cover"
-        >
+    <div class="card" id="mainCard">
+        <img src="https://i.discogs.com/5R-oq3TIGcORe074z72WtHIKTukRglruK_86wlSyhag/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE3NjAx/ODI2LTE2NDI3ODky/NTMtOTE5Ni5qcGVn.jpeg" alt="Cover" class="cover">
 
         <h1>Astronaut in the Ocean</h1>
         <p class="artist">Masked Wolf</p>
 
-        <!-- Плеер теперь берет файл song.mp3 из твоего же репозитория -->
-        <audio controls autoplay loop>
+        <!-- Плеер (музыка) -->
+        <audio id="myAudio" controls loop>
             <source src="song.mp3" type="audio/mpeg">
             Ваш браузер не поддерживает аудиоплеер.
         </audio>
+
+        <p class="hint">Нажми на экран для полного погружения</p>
     </div>
 
     <script>
+        // Генерация звезд
         const starsContainer = document.getElementById('stars');
         const starCount = 80;
         for (let i = 0; i < starCount; i++) {
@@ -159,6 +193,39 @@
             star.style.animationDelay = Math.random() * 5 + 's';
             starsContainer.appendChild(star);
         }
+
+        // Функция для включения полного экрана и запуска музыки
+        function engageExperience() {
+            // 1. Включаем полноэкранный режим
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log("Ошибка полного экрана:", err);
+                    });
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Для Safari */
+                    document.documentElement.webkitRequestFullscreen();
+                }
+            }
+            
+            // 2. Запускаем музыку (если браузер заблокировал автоплей)
+            const audio = document.getElementById('myAudio');
+            if (audio.paused) {
+                audio.play().catch(e => console.log("Автоплей заблокирован"));
+            }
+
+            // Убираем обработчики после первого клика
+            document.removeEventListener('click', engageExperience);
+            document.removeEventListener('touchstart', engageExperience);
+        }
+
+        // Вешаем событие на ЛЮБОЕ действие пользователя (клик или тап на телефоне)
+        document.addEventListener('click', engageExperience);
+        document.addEventListener('touchstart', engageExperience);
+        
+        // Запрещаем масштабирование страницы пальцами (чтобы не ломать дизайн)
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
     </script>
 
 </body>

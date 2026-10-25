@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Astronaut in the Ocean — Masked Wolf</title>
-    <meta name="description" content="Слушайте Astronaut in the Ocean от Masked Wolf. Официальный плеер и информация о треке.">
     <style>
-        /* Базовые настройки */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Базовые настройки: запрет прокрутки и центрирование */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         body {
             font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
-            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #0b0f1a;
-            overflow-x: hidden;
+            overflow: hidden; /* Убираем прокрутку */
             color: #fff;
-            padding: 20px;
         }
 
         /* Анимированный градиентный фон */
@@ -62,8 +65,8 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 28px;
             padding: 35px 30px;
-            max-width: 440px;
-            width: 100%;
+            max-width: 400px;
+            width: 90%;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -73,10 +76,10 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Обложка */
+        /* Обложка из скриншота */
         .cover {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border-radius: 24px;
             object-fit: cover;
             margin: 0 auto 22px;
@@ -89,7 +92,7 @@
 
         /* Текст */
         h1 {
-            font-size: 1.65rem;
+            font-size: 1.6rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             margin-bottom: 6px;
@@ -102,61 +105,32 @@
             font-size: 1.05rem;
             color: #a0aec0;
             font-weight: 400;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             letter-spacing: 0.5px;
         }
 
-        /* Плеер */
-        .player-wrapper {
-            margin-bottom: 20px;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Описание */
-        .description {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #cbd5e0;
-            margin-bottom: 22px;
-            padding: 0 8px;
-        }
-        .description strong { color: #93c5fd; }
-
-        /* Ссылки */
-        .links {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
+        /* Скрываем стандартный вид аудиоплеера и стилизуем его */
+        audio {
+            width: 100%;
+            height: 50px;
+            outline: none;
             border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #fff;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
         }
-        .btn:hover {
-            background: rgba(255,255,255,0.18);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        /* Стилизация для Webkit (Chrome, Safari, Edge) */
+        audio::-webkit-media-controls-panel {
+            background-color: rgba(255, 255, 255, 0.1);
         }
-        .btn-tiktok { background: rgba(254, 44, 85, 0.2); border-color: rgba(254, 44, 85, 0.4); }
-        .btn-tiktok:hover { background: rgba(254, 44, 85, 0.35); }
-
-        /* Адаптив */
+        audio::-webkit-media-controls-play-button {
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        
+        /* Адаптив для маленьких экранов */
         @media (max-width: 480px) {
             .card { padding: 28px 20px; }
-            .cover { width: 160px; height: 160px; }
+            .cover { width: 180px; height: 180px; }
             h1 { font-size: 1.4rem; }
         }
     </style>
@@ -169,9 +143,9 @@
 
     <!-- Карточка с контентом -->
     <div class="card">
-        <!-- Обложка -->
+        <!-- Твоя обложка со скриншота -->
         <img 
-            src="https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=600&q=80" 
+            src="https://i.discogs.com/5R-oq3TIGcORe074z72WtHIKTukRglruK_86wlSyhag/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE3NjAx/ODI2LTE2NDI3ODky/NTMtOTE5Ni5qcGVn.jpeg" 
             alt="Astronaut in the Ocean Cover" 
             class="cover"
         >
@@ -179,35 +153,12 @@
         <h1>Astronaut in the Ocean</h1>
         <p class="artist">Masked Wolf</p>
 
-        <!-- Плеер Spotify (официальный трек) -->
-        <div class="player-wrapper">
-            <iframe 
-                style="border-radius:12px" 
-                src="https://open.spotify.com/embed/track/6E90gq0KO6FYZVOXx8kCcC?utm_source=generator&theme=0" 
-                width="100%" 
-                height="152" 
-                frameBorder="0" 
-                allowfullscreen="" 
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                loading="lazy">
-            </iframe>
-        </div>
-
-        <p class="description">
-            Трек о борьбе с <strong>депрессией и тревогой</strong>, который стал вирусным в TikTok. 
-            Слушайте официальную версию прямо здесь.
-        </p>
-
-        <!-- Ссылки -->
-        <div class="links">
-            <!-- ЗАМЕНИ @ВАШ_ПРОФИЛЬ НА СВОЙ НИКНЕЙМ -->
-            <a href="https://www.tiktok.com/@ВАШ_ПРОФИЛЬ" target="_blank" class="btn btn-tiktok">
-                🎵 Мой TikTok
-            </a>
-            <a href="https://open.spotify.com/track/6E90gq0KO6FYZVOXx8kCcC" target="_blank" class="btn">
-                💚 Spotify
-            </a>
-        </div>
+        <!-- Аудиоплеер с полной версией трека -->
+        <!-- Внимание: если ссылка перестанет работать, её можно заменить на любую другую прямую ссылку на MP3 -->
+        <audio controls autoplay loop>
+            <source src="https://soundloud.net/11374/stream" type="audio/mpeg">
+            Ваш браузер не поддерживает аудиоплеер.
+        </audio>
     </div>
 
     <script>

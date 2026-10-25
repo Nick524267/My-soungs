@@ -2,18 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Astronaut in the Ocean</title>
     <style>
-        /* Сброс отступов */
+        /* 1. Базовый сброс и защита от выделения */
         * { 
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            /* Убираем синее выделение при тапе на телефонах */
-            -webkit-tap-highlight-color: transparent;
-            user-select: none; /* Запрещаем выделять текст */
+            -webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при клике */
+            user-select: none; /* Запрещает выделение текста */
             -webkit-user-select: none;
+            -webkit-touch-callout: none; /* Запрещает меню при долгом нажатии */
         }
         
         body {
@@ -24,11 +24,12 @@
             justify-content: center;
             align-items: center;
             background: #0b0f1a;
-            overflow: hidden;
+            overflow: hidden; /* Запрет любой прокрутки */
+            position: fixed; /* Фиксирует экран от "резинового" скролла на iOS */
             color: #fff;
         }
 
-        /* Анимированный градиентный фон */
+        /* 2. Анимированный градиентный фон */
         .bg-gradient {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -43,12 +44,12 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Звёзды */
+        /* 3. Звёзды на фоне */
         .stars {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            pointer-events: none;
+            pointer-events: none; /* Клики проходят сквозь звезды */
         }
         .star {
             position: absolute;
@@ -62,11 +63,12 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* Кнопка полноэкранного режима (СЛЕВА СВЕРХУ) */
+        /* 4. Кнопка полного экрана (Слева сверху) */
         .fullscreen-btn {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            /* Учитываем "челку" iPhone (safe-area) */
+            top: calc(15px + env(safe-area-inset-top));
+            left: calc(15px + env(safe-area-inset-left));
             width: 45px;
             height: 45px;
             background: rgba(255, 255, 255, 0.1);
@@ -79,18 +81,19 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            transition: all 0.15s ease; /* Плавная анимация */
+            transition: all 0.15s ease;
             backdrop-filter: blur(10px);
-            outline: none; /* Убираем рамку фокуса */
+            -webkit-backdrop-filter: blur(10px);
+            outline: none;
         }
         
-        /* Эффект при нажатии (посветление и уменьшение) */
+        /* Эффект при нажатии на кнопку */
         .fullscreen-btn:active {
             background: rgba(255, 255, 255, 0.4);
             transform: scale(0.85);
         }
 
-        /* Основная карточка */
+        /* 5. Основная карточка */
         .card {
             background: rgba(20, 25, 45, 0.55);
             backdrop-filter: blur(18px) saturate(180%);
@@ -106,7 +109,8 @@
             transition: all 0.4s ease;
         }
 
-        :fullscreen .card {
+        /* Увеличение карточки в полноэкранном режиме */
+        :fullscreen .card, :-webkit-full-screen .card {
             max-width: 600px;
             padding: 50px 40px;
             border-radius: 40px;
@@ -117,7 +121,7 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Обложка */
+        /* 6. Обложка */
         .cover {
             width: 220px;
             height: 220px;
@@ -128,14 +132,14 @@
             border: 2px solid rgba(255, 255, 255, 0.15);
             display: block;
             transition: transform 0.4s ease;
-            pointer-events: none; /* Чтобы клики не выделяли картинку */
+            pointer-events: none; /* Запрещает клики по картинке, чтобы они шли на карточку */
         }
-        :fullscreen .cover {
+        :fullscreen .cover, :-webkit-full-screen .cover {
             width: 300px;
             height: 300px;
         }
 
-        /* Текст */
+        /* 7. Текст */
         h1 {
             font-size: 1.6rem;
             font-weight: 700;
@@ -145,8 +149,9 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            pointer-events: none;
         }
-        :fullscreen h1 { font-size: 2rem; }
+        :fullscreen h1, :-webkit-full-screen h1 { font-size: 2rem; }
 
         .artist {
             font-size: 1.05rem;
@@ -154,9 +159,10 @@
             font-weight: 400;
             margin-bottom: 25px;
             letter-spacing: 0.5px;
+            pointer-events: none;
         }
 
-        /* Аудиоплеер */
+        /* 8. Аудиоплеер */
         audio {
             width: 100%;
             height: 50px;
@@ -166,29 +172,33 @@
             margin-top: 10px;
         }
         
+        /* 9. Адаптив для узких экранов */
         @media (max-width: 480px) {
             .card { padding: 28px 20px; }
             .cover { width: 180px; height: 180px; }
-            :fullscreen .cover { width: 220px; height: 220px; }
+            :fullscreen .cover, :-webkit-full-screen .cover { width: 220px; height: 220px; }
             h1 { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Кнопка на весь экран (Слева сверху) -->
+    <!-- Кнопка на весь экран -->
     <button class="fullscreen-btn" id="fsBtn" title="На весь экран">⛶</button>
 
     <div class="bg-gradient"></div>
     <div class="stars" id="stars"></div>
 
+    <!-- Карточка -->
     <div class="card" id="mainCard">
+        <!-- Обложка -->
         <img src="https://i.discogs.com/5R-oq3TIGcORe074z72WtHIKTukRglruK_86wlSyhag/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE3NjAx/ODI2LTE2NDI3ODky/NTMtOTE5Ni5qcGVn.jpeg" alt="Cover" class="cover">
 
+        <!-- Название и автор -->
         <h1>Astronaut in the Ocean</h1>
         <p class="artist">Masked Wolf</p>
 
-        <!-- Плеер (song.mp3) -->
+        <!-- Плеер (файл song.mp3 должен лежать рядом с index.html) -->
         <audio id="myAudio" controls loop>
             <source src="song.mp3" type="audio/mpeg">
             Ваш браузер не поддерживает аудиоплеер.
@@ -196,7 +206,7 @@
     </div>
 
     <script>
-        // Генерация звезд
+        // Генерация звезд на фоне
         const starsContainer = document.getElementById('stars');
         const starCount = 80;
         for (let i = 0; i < starCount; i++) {
@@ -215,7 +225,7 @@
         const fsBtn = document.getElementById('fsBtn');
         const audio = document.getElementById('myAudio');
 
-        // Функция для переключения полноэкранного режима
+        // Функция переключения полного экрана
         function toggleFullScreen() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
@@ -234,28 +244,36 @@
             }
         }
 
-        // 1. Работа кнопки
+        // 1. Нажатие на кнопку в левом верхнем углу
         fsBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); 
+            e.stopPropagation(); // Не даем клику уйти на фон
             toggleFullScreen();
         });
 
-        // 2. Включение при клике в любом месте страницы
+        // 2. Нажатие в любом месте экрана (КРОМЕ плеера)
         document.addEventListener('click', (e) => {
-            // Если кликнули по плееру — не трогаем
-            if (e.target.tagName === 'AUDIO' || e.target.closest('audio')) {
+            // Если кликнули по аудиоплееру или его элементам — игнорируем
+            if (e.target.closest('audio')) {
                 return; 
             }
             
-            // Включаем полный экран, если еще не включен
-            if (!document.fullscreenElement) {
+            // Включаем полный экран, если его нет
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 toggleFullScreen();
             }
 
-            // Пробуем запустить музыку
+            // Пытаемся запустить музыку при клике
             if (audio.paused) {
-                audio.play().catch(err => console.log("Звук заблокирован", err));
+                audio.play().catch(err => console.log("Браузер заблокировал автозапуск звука"));
             }
+        });
+
+        // 3. Если пользователь нажал Esc или свайпнул, чтобы выйти из полного экрана
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) fsBtn.innerHTML = '⛶';
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement) fsBtn.innerHTML = '⛶';
         });
     </script>
 

@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Astronaut in the Ocean — Masked Wolf</title>
     <style>
-        /* Базовые настройки: запрет прокрутки и центрирование */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
             height: 100vh;
@@ -19,7 +14,7 @@
             justify-content: center;
             align-items: center;
             background: #0b0f1a;
-            overflow: hidden; /* Убираем прокрутку */
+            overflow: hidden; /* Запрет прокрутки */
             color: #fff;
         }
 
@@ -76,7 +71,7 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Обложка из скриншота */
+        /* Обложка */
         .cover {
             width: 220px;
             height: 220px;
@@ -109,7 +104,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Скрываем стандартный вид аудиоплеера и стилизуем его */
+        /* Аудиоплеер */
         audio {
             width: 100%;
             height: 50px;
@@ -118,16 +113,8 @@
             background: rgba(255, 255, 255, 0.1);
             margin-top: 10px;
         }
-        /* Стилизация для Webkit (Chrome, Safari, Edge) */
-        audio::-webkit-media-controls-panel {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        audio::-webkit-media-controls-play-button {
-            background-color: #fff;
-            border-radius: 50%;
-        }
         
-        /* Адаптив для маленьких экранов */
+        /* Адаптив */
         @media (max-width: 480px) {
             .card { padding: 28px 20px; }
             .cover { width: 180px; height: 180px; }
@@ -137,13 +124,10 @@
 </head>
 <body>
 
-    <!-- Фон -->
     <div class="bg-gradient"></div>
     <div class="stars" id="stars"></div>
 
-    <!-- Карточка с контентом -->
     <div class="card">
-        <!-- Твоя обложка со скриншота -->
         <img 
             src="https://i.discogs.com/5R-oq3TIGcORe074z72WtHIKTukRglruK_86wlSyhag/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE3NjAx/ODI2LTE2NDI3ODky/NTMtOTE5Ni5qcGVn.jpeg" 
             alt="Astronaut in the Ocean Cover" 
@@ -153,16 +137,14 @@
         <h1>Astronaut in the Ocean</h1>
         <p class="artist">Masked Wolf</p>
 
-        <!-- Аудиоплеер с полной версией трека -->
-        <!-- Внимание: если ссылка перестанет работать, её можно заменить на любую другую прямую ссылку на MP3 -->
+        <!-- Плеер теперь берет файл song.mp3 из твоего же репозитория -->
         <audio controls autoplay loop>
-            <source src="https://soundloud.net/11374/stream" type="audio/mpeg">
+            <source src="song.mp3" type="audio/mpeg">
             Ваш браузер не поддерживает аудиоплеер.
         </audio>
     </div>
 
     <script>
-        // Генерация звёзд на фоне
         const starsContainer = document.getElementById('stars');
         const starCount = 80;
         for (let i = 0; i < starCount; i++) {
